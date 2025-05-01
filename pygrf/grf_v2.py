@@ -354,7 +354,7 @@ class GRF:
 
         # get the version
         version, = struct.unpack('<I', data[VERSION])
-        version &= 0xff00  # ignore minor version information
+        #version &= 0xff00  # ignore minor version information
         if version not in SUPPORTED_VERSIONS:
             raise GRFParseError('unsupported version :', hex(version))
 

@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-from pygrf import api
+import pygrf.api as api
 
 parser = argparse.ArgumentParser(description="Command Line Tool")
 
