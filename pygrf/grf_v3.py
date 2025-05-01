@@ -3,6 +3,7 @@ import contextlib
 import io
 import os
 import struct
+import sys
 import zlib
 from . import filetypes
 from .exceptions import GRFParseError
@@ -56,12 +57,29 @@ class GRFFile(io.BytesIO):
         if self.header.real_size == 0:
             self.data = b''
         else:
-            self.data = zlib.decompress(stream.read(self.header.archived_size))
+            raw_data = stream.read(self.header.archived_size)
+            #print(raw_data[:32].hex(), file=sys.stderr)
+            #print(f"filename={filename}", file=sys.stderr)
+            #print(f"seek pos={self.header.position}", file=sys.stderr)
+            #print(f"archived_size={self.header.archived_size}", file=sys.stderr)
+            #print(f"real_size={self.header.real_size}", file=sys.stderr)
+            #print(f"flag={self.header.flag}", file=sys.stderr)
+            #print(f"read size={len(raw_data)}", file=sys.stderr)
+
+            if self.header.flag == 1:
+                try:
+                    self.data = zlib.decompress(raw_data)
+                except zlib.error as ex:
+                    raise NotImplementedError(f"Unsupported compression : {ex}")
+            elif self.header.flag == 0:
+                self.data = raw_data
+            else:
+                raise NotImplementedError(f"Unsupported compression flag: {self.header.flag}")
+
         super().__init__(self.data)
 
     def __eq__(self, other):
         return other.filename == self.filename and other.data == self.data
-
 
     def parse_file_header(self, data):
         """parse file header
@@ -115,11 +133,11 @@ class GRFFile(io.BytesIO):
         """
         SIZES = slice(0, 12)
         FLAG = 12
-        POSITION = slice(13, 17)
+        POSITION = slice(13, 21)
 
         compressed, archived, real = struct.unpack('<III', data[SIZES])
         flag = data[FLAG]
-        position, = struct.unpack('<I', data[POSITION])
+        position, = struct.unpack('<Q', data[POSITION])
         position += HEADER_LENGTH
 
         return FileHeader(compressed, archived, real, flag, position)
