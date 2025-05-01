@@ -21,13 +21,6 @@ parser.add_argument("filename",
                     type=str,
                     help="filename to extract")
 
-parser.add_argument("--decoding",
-                    action="store",
-                    nargs="?",
-                    default="cp932",
-                    type=str,
-                    help="default decoding")
-
 args = parser.parse_args()
 
 def main(args):
@@ -36,13 +29,7 @@ def main(args):
         grf = api.open_grf(fp)
 
         if args.filename is not None:
-            data_bytes: bytes = grf.open(args.filename).data
-            try:
-                text_data = data_bytes.decode(args.decoding)
-                print(text_data)  # テキストとして出力
-            except UnicodeDecodeError:
-                # デコードできない場合はバイナリデータとして出力
-                sys.stdout.buffer.write(data_bytes)
+            sys.stdout.buffer.write(grf.open(args.filename).data)
         else:
             # ファイル一覧を表示
             for file in grf.files():
