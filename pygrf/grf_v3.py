@@ -124,7 +124,7 @@ class GRFFile(io.BytesIO):
 
         return FileHeader(compressed, archived, real, flag, position)
 
-class Index:
+class GRFIndex:
     """
     GRF Index
     =========
@@ -238,7 +238,7 @@ class GRF:
     def __init__(self, stream):
         self.stream = stream
         self.header = self.parse_header(self.stream)
-        self.index = Index(self.stream, self.header)
+        self.index = GRFIndex(self.stream, self.header)
 
     def parse_header(self, stream):
         """parse the grf header

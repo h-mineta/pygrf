@@ -3,3 +3,4 @@ __pycache__/
 *.py[co]
 .pytest_cache
 .vscode/
+data.grf

@@ -1,13 +1,25 @@
-from . import grf, gat, spr, act
+from .exceptions import GRFParseError
+from . import gat, grf_v2, grf_v3, spr, act
 
 
-def open_grf(filename: str) -> grf.GRF:
+def open_grf(filename: str):
     """
     Open a GRF archive
 
     :param filename: the path to the grf archive file
     """
-    return grf.GRF(open(filename, 'rb'))
+    grf = None
+    with open(filename, "rb") as fp:
+        try:
+            grf = grf_v2.GRF(fp)
+        except GRFParseError as ex1:
+            try:
+                # If the file is not a GRF v2, try to parse it as GRF v3
+                fp.seek(0)
+                grf = grf_v3.GRF(fp)
+            except GRFParseError as ex2:
+                raise GRFParseError(f"Failed to parse GRF file: {ex2}")
+    return grf
 
 
 def open_gat(filename: str) -> gat.GAT:
