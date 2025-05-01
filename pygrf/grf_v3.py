@@ -86,7 +86,7 @@ class GRFFile(io.BytesIO):
 
         :param header_data: the raw header data to parse
 
-        The file header is made up of 17 bytes of information arranged in the
+        The file header is made up of 21 bytes of information arranged in the
         following way:
 
         ======  ====  ===============
@@ -342,7 +342,7 @@ class GRF:
         # get the position of the file list
         offset, = struct.unpack('<Q', data[OFFSET])
 
-        # seek
+        # seed
         seed = 0
 
         # get the number of files
