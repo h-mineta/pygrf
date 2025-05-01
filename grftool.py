@@ -38,6 +38,7 @@ def main(args):
                 # デコードできない場合はバイナリデータとして出力
                 sys.stdout.buffer.write(data_bytes)
         else:
+            # ファイル一覧を表示
             for file in grf.files():
                 print(f"{file}")
 
