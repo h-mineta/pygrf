@@ -94,7 +94,7 @@ class GRFFile(io.BytesIO):
         ======  ====  ===============
         0       12    sizes
         12      1     flags
-        13      4     position
+        13      8     position
         ======  ====  ===============
 
         All integers are stored in little endian byte order.
