@@ -21,6 +21,13 @@ parser.add_argument("filename",
                     type=str,
                     help="filename to extract")
 
+parser.add_argument("--decoding",
+                    action="store",
+                    nargs="?",
+                    default="cp932",
+                    type=str,
+                    help="default decoding")
+
 args = parser.parse_args()
 
 def main(args):
@@ -31,8 +38,7 @@ def main(args):
         if args.filename is not None:
             data_bytes: bytes = grf.open(args.filename).data
             try:
-                # Shift-JIS(CP932) データとしてデコード可能か確認
-                text_data = data_bytes.decode("cp932")
+                text_data = data_bytes.decode(args.decoding)
                 print(text_data)  # テキストとして出力
             except UnicodeDecodeError:
                 # デコードできない場合はバイナリデータとして出力
