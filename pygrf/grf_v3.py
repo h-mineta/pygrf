@@ -56,7 +56,7 @@ class GRFFile(io.BytesIO):
         if self.header.real_size == 0:
             self.data = b''
         else:
-            self.data = zlib.decompress(self.data)
+            self.data = zlib.decompress(stream.read(self.header.archived_size))
         super().__init__(self.data)
 
     def __eq__(self, other):
