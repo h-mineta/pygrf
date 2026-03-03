@@ -66,15 +66,22 @@ class GRFFile(io.BytesIO):
             #print(f"flag={self.header.flag}", file=sys.stderr)
             #print(f"read size={len(raw_data)}", file=sys.stderr)
 
-            if self.header.flag == 1:
+            # Determine if the file is compressed by comparing sizes
+            # If compressed_size < real_size, the file is compressed with zlib
+            # Use archived_size to detect if data was actually stored compressed
+            if self.header.archived_size < self.header.real_size:
                 try:
                     self.data = zlib.decompress(raw_data)
                 except zlib.error as ex:
-                    raise NotImplementedError(f"Unsupported compression : {ex}")
-            elif self.header.flag == 0:
-                self.data = raw_data
+                    # If zlib fails, try treating as uncompressed
+                    if raw_data[:2] in [b'x\x9c', b'x\x01', b'x\xda', b'x\x5e']:
+                        # Valid zlib header but failed to decompress
+                        raise NotImplementedError(f"Unsupported compression : {ex}")
+                    else:
+                        # Not a zlib stream, treat as uncompressed
+                        self.data = raw_data
             else:
-                raise NotImplementedError(f"Unsupported compression flag: {self.header.flag}")
+                self.data = raw_data
 
         super().__init__(self.data)
 
